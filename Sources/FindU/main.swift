@@ -7,6 +7,7 @@
 
 import Foundation
 import CommandLineKit
+import Rainbow
 
 let appVersion = "0.0.1"
 
@@ -28,7 +29,7 @@ cli.addOption(ocClassOption)
 
 let fileExtOption = MultiStringOption(
     shortFlag: "f", longFlag: "file-extensions", required: false,
-    helpMessage: "In which type of file you search for usage, defualt is '.m .mm .swift'")
+    helpMessage: "In which type of file you search for usage, defualt is 'h m mm swift'")
 cli.addOption(fileExtOption)
 
 let printFmtOption = StringOption(
@@ -53,14 +54,29 @@ do {
   exit(EX_USAGE)
 }
 
-if helpOption.value {
+if !cli.unparsedArguments.isEmpty {
+    print("Unknow arguments: \(cli.unparsedArguments)".red)
+    cli.printUsage()
+    exit(EX_USAGE)
+}
+
+if helpOption.wasSet {
     cli.printUsage()
     exit(EX_OK)
 }
 
-if versionOption.value {
+if versionOption.wasSet {
     print(appVersion)
     exit(EX_OK)
 }
 
+guard swiftClassOption.wasSet || ocClassOption.wasSet else {
+    print("You at least input one class name")
+    exit(EX_OK)
+}
 
+let projectPath = projectPathOption.value ?? "."
+let swiftClasses = swiftClassOption.value ?? []
+let ocClasses = ocClassOption.value ?? []
+let fileExt = fileExtOption.value ?? ["h", "m", "mm", "swift"]
+let printFmt = printFmtOption.value ?? "<C>: <T>"
