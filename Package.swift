@@ -9,9 +9,13 @@ let package = Package(
         .executable(name: "FindU", targets: ["FindU"]),
     ],
     dependencies: [
+        .package(url: "https://github.com/IngmarStein/CommandLineKit", from: "2.3.0"),
+        .package(url: "https://github.com/kylef/PathKit.git", from: "1.0.1"),
+        .package(url: "https://github.com/onevcat/Rainbow.git", from: "3.1.1"),
     ],
     targets: [
-        .executableTarget(name: "FindU", dependencies: []),
+        .executableTarget(name: "FindU", dependencies: ["FindUKit", "CommandLineKit"]),
+        .target(name: "FindUKit", dependencies: ["PathKit", "Rainbow"]),
         .testTarget(name: "FindUTests", dependencies: ["FindU"]),
     ]
 )
