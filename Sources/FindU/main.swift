@@ -87,5 +87,9 @@ let findU = FindU(projectPath: projectPath,
                   ocClasses: ocClasses,
                   searchInFileExt: fileExt)
 
+let usageInfo = findU.getTotalUsage()
+_ = usageInfo.map { info in
+    print("ClassName: \(info.className) Totoal: \(info.totalCount)")
+}
 
 
