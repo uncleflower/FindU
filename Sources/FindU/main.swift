@@ -8,6 +8,7 @@
 import Foundation
 import CommandLineKit
 import Rainbow
+import FindUKit
 
 let appVersion = "0.0.1"
 
@@ -80,3 +81,11 @@ let swiftClasses = swiftClassOption.value ?? []
 let ocClasses = ocClassOption.value ?? []
 let fileExt = fileExtOption.value ?? ["h", "m", "mm", "swift"]
 let printFmt = printFmtOption.value ?? "<C>: <T>"
+
+let findU = FindU(projectPath: projectPath,
+                  swiftClasses: swiftClasses,
+                  ocClasses: ocClasses,
+                  searchInFileExt: fileExt)
+
+
+
