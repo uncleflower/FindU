@@ -37,8 +37,6 @@ class SwiftASTVisitor: SyntaxVisitor, FileASTVisitor {
         // TODO: a littel weird, should optimize it
         _ = classNames.filter { node.description.cleanString == $0 }.map {
             result[$0]! += 1
-            // TODO: for test delete me!
-            print("\($0): \(filePath)")
         }
         return .visitChildren
     }
@@ -64,20 +62,15 @@ class OCASTVisitor: FileASTVisitor {
         _ = classNames.map { result[$0] = 0 }
     }
     
-    // TODO: Use regular expression
+    // TODO: Use regular expression, check whether it needs to be changed to AST.
     func analyze() throws -> [ClassName : Count] {
         guard !classNames.isEmpty else { return [:] }
         let content = (try? Path(filePath).read()) ?? ""
-        // TODO: Check whether it needs to be changed to AST.
         _ = try classNames.map { className in
             let regex = "\\[\(className) "
             let re = try NSRegularExpression(pattern: regex, options: [])
             let matchs = re.matches(in: content, options: .reportProgress, range: NSRange(location: 0, length: content.count))
             result[className] = matchs.count
-            // TODO: for test delete me!
-            if !matchs.isEmpty {
-                print("\(className): \(filePath)")
-            }
         }
         return result
     }

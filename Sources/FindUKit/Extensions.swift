@@ -18,12 +18,14 @@ extension String {
     }
 }
 
-public func += (left: inout [String : Int], right: [String : Int]) {
-    for (k, v) in right {
-        if left[k] != nil {
-            left[k]! += v
-        } else {
-            left[k] = v
+public func += (left: inout [UsageInfo], right: [UsageInfo]) {
+    for leftUsage in left {
+        for rightUsage in right {
+            if leftUsage.className == rightUsage.className {
+                leftUsage.totalCount += rightUsage.totalCount
+                leftUsage.atFilePathes = leftUsage.atFilePathes.union(rightUsage.atFilePathes)
+                break
+            }
         }
     }
 }

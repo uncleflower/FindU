@@ -31,13 +31,15 @@ enum FileType {
     }
 }
 
-public struct UsageInfo {
+public class UsageInfo {
     public let className: String
-    public let totalCount: Int
+    public var totalCount: Int
+    public var atFilePathes = Set<String>()
     
-    init(className: String, totalCount: Int) {
+    init(className: String, totalCount: Int, inFilePaths: Set<String> = []) {
         self.className = className
         self.totalCount = totalCount
+        self.atFilePathes = inFilePaths
     }
 }
 
@@ -46,6 +48,7 @@ public struct FindU {
     let swiftClasses: [String]
     let ocClasses: [String]
     let searchInFileExt: [String]
+    var result: [UsageInfo] = []
     
     public init(projectPath: String, swiftClasses: [String], ocClasses: [String], searchInFileExt: [String]) {
         self.projectPath = Path(projectPath).absolute()
@@ -55,10 +58,10 @@ public struct FindU {
     }
     
     public func getTotalUsage() -> [UsageInfo] {
-        return searchAllFilePathes().reduce(into: [:]) { curResult, filePath in
+        let emptyUsageInfo = (swiftClasses + ocClasses.filter { !swiftClasses.contains($0) })
+            .map { UsageInfo(className: $0, totalCount: 0) }
+        return searchAllFilePathes().reduce(into: emptyUsageInfo) { curResult, filePath in
             curResult += analyzeFile(filePath: filePath)
-        }.map {
-            UsageInfo(className: $0, totalCount: $1)
         }
     }
     
@@ -71,9 +74,14 @@ public struct FindU {
         return result
     }
     
-    func analyzeFile(filePath: String) -> [String : Int] {
-        guard let fileType = FileType(ext: filePath.ext) else { return [:] }
+    func analyzeFile(filePath: String) -> [UsageInfo] {
+        guard let fileType = FileType(ext: filePath.ext) else { return [] }
         let analyzer = fileType.fileASTAnalyzer(swiftClasses: swiftClasses, ocClasses: ocClasses, in: filePath)
-        return (try? analyzer.analyze()) ?? [:]
+        let classCountRes = (try? analyzer.analyze()) ?? [:]
+        return classCountRes.map {
+            return UsageInfo(className: $0.key,
+                             totalCount: $0.value,
+                             inFilePaths: ($0.value != 0) ? [filePath] : [])
+        }
     }
 }
