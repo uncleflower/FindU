@@ -18,6 +18,11 @@ let projectPathOption = StringOption(
     helpMessage: "Root path of your project. Default is current folder.")
 cli.addOption(projectPathOption)
 
+let classesOption = MultiStringOption(
+    shortFlag: "c", longFlag: "classes", required: false,
+    helpMessage: "Class name in both Swift and Objective-C")
+cli.addOption(classesOption)
+
 let swiftClassOption = MultiStringOption(
     shortFlag: "s", longFlag: "swift-classes", required: false,
     helpMessage: "Class names in Swift")
@@ -71,14 +76,18 @@ if versionOption.wasSet {
     exit(EX_OK)
 }
 
-guard swiftClassOption.wasSet || ocClassOption.wasSet else {
+guard classesOption.wasSet || swiftClassOption.wasSet || ocClassOption.wasSet else {
     print("You at least input one class name")
     exit(EX_OK)
 }
 
 let projectPath = projectPathOption.value ?? "."
-let swiftClasses = swiftClassOption.value ?? []
-let ocClasses = ocClassOption.value ?? []
+var swiftClasses = swiftClassOption.value ?? []
+var ocClasses = ocClassOption.value ?? []
+ocClassOption.value.map {
+    swiftClasses.append(contentsOf: $0)
+    ocClasses.append(contentsOf: $0)
+}
 let fileExt = fileExtOption.value ?? ["h", "m", "mm", "swift"]
 let printFmt = printFmtOption.value ?? "<C>: <T>"
 
