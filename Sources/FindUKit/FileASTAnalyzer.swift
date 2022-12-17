@@ -6,23 +6,25 @@
 //
 
 import Foundation
+import PathKit
 import SwiftSyntax
 import SwiftSyntaxParser
 
 protocol FileASTVisitor {
-    typealias FileName = String
+    typealias ClassName = String
     typealias Count = Int
     
     var classNames: [String] { get }
     var filePath: String { get }
-    func analyze() throws -> [FileName : Count]
+    
+    func analyze() throws -> [ClassName : Count]
 }
 
 // MARK: - SwiftAST
 class SwiftASTVisitor: SyntaxVisitor, FileASTVisitor {
     var classNames: [String]
     var filePath: String
-    var result = [FileName : Count]()
+    var result = [ClassName : Count]()
     
     init(classNames: [String], filePath: String) {
         self.classNames = classNames
@@ -33,11 +35,16 @@ class SwiftASTVisitor: SyntaxVisitor, FileASTVisitor {
     
     override func visit(_ node: IdentifierExprSyntax) -> SyntaxVisitorContinueKind {
         // TODO: a littel weird, should optimize it
-        _ = classNames.filter { node.description.cleanString == $0 }.map { result[$0]! += 1 }
+        _ = classNames.filter { node.description.cleanString == $0 }.map {
+            result[$0]! += 1
+            // TODO: for test delete me!
+            print("\($0): \(filePath)")
+        }
         return .visitChildren
     }
     
-    func analyze() throws -> [FileName : Count] {
+    func analyze() throws -> [ClassName : Count] {
+        guard !classNames.isEmpty else { return [:] }
         let treeURL = URL(fileURLWithPath: filePath)
         let tree = try SyntaxParser.parse(treeURL)
         self.walk(tree)
@@ -49,15 +56,30 @@ class SwiftASTVisitor: SyntaxVisitor, FileASTVisitor {
 class OCASTVisitor: FileASTVisitor {
     var classNames: [String]
     var filePath: String
+    var result = [ClassName : Count]()
     
     init(classNames: [String], filePath: String) {
         self.classNames = classNames
         self.filePath = filePath
+        _ = classNames.map { result[$0] = 0 }
     }
     
-    func analyze() throws -> [FileName : Count] {
-        if classNames.isEmpty { return [:] }
-        fatalError()
+    // TODO: Use regular expression
+    func analyze() throws -> [ClassName : Count] {
+        guard !classNames.isEmpty else { return [:] }
+        let content = (try? Path(filePath).read()) ?? ""
+        // TODO: Check whether it needs to be changed to AST.
+        _ = try classNames.map { className in
+            let regex = "\\[\(className) "
+            let re = try NSRegularExpression(pattern: regex, options: [])
+            let matchs = re.matches(in: content, options: .reportProgress, range: NSRange(location: 0, length: content.count))
+            result[className] = matchs.count
+            // TODO: for test delete me!
+            if !matchs.isEmpty {
+                print("\(className): \(filePath)")
+            }
+        }
+        return result
     }
 }
 
