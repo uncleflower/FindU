@@ -38,11 +38,6 @@ let fileExtOption = MultiStringOption(
     helpMessage: "In which type of file you search for usage, defualt is 'h m mm swift'")
 cli.addOption(fileExtOption)
 
-let printFmtOption = StringOption(
-    longFlag: "print-format", required: false,
-    helpMessage: "Customize the print format. You can pass ClassName:<C> Total:<T>. <C> will be replaced by class name, <T> will be replaced by total count")
-cli.addOption(printFmtOption)
-
 let versionOption = BoolOption(
     longFlag: "version",
     helpMessage: "Print version.")
@@ -84,12 +79,11 @@ guard classesOption.wasSet || swiftClassOption.wasSet || ocClassOption.wasSet el
 let projectPath = projectPathOption.value ?? "."
 var swiftClasses = swiftClassOption.value ?? []
 var ocClasses = ocClassOption.value ?? []
-ocClassOption.value.map {
+classesOption.value.map {
     swiftClasses.append(contentsOf: $0)
     ocClasses.append(contentsOf: $0)
 }
 let fileExt = fileExtOption.value ?? ["h", "m", "mm", "swift"]
-let printFmt = printFmtOption.value ?? "<C>: <T>"
 
 let findU = FindU(projectPath: projectPath,
                   swiftClasses: swiftClasses,
@@ -98,7 +92,7 @@ let findU = FindU(projectPath: projectPath,
 
 let usageInfo = findU.getTotalUsage()
 _ = usageInfo.map { info in
-    print("ClassName: \(info.className) Totoal: \(info.totalCount)")
+    print("Class: \(info.className) Count: \(info.totalCount)")
 }
 
 
