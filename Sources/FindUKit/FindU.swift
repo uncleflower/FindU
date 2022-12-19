@@ -66,7 +66,7 @@ public struct FindU {
     }
     
     func searchAllFilePathes() -> Set<String> {
-        let finder = ExtensionFindProcess(path: projectPath, extensions: searchInFileExt, excluded: swiftClasses + ocClasses)
+        let finder = ExtensionFindProcess(path: projectPath, extensions: searchInFileExt, excludeClasses: swiftClasses + ocClasses)
         guard let result = finder?.execute() else {
             print("Files finding failed.".red)
             return []
@@ -82,6 +82,22 @@ public struct FindU {
             return UsageInfo(className: $0.key,
                              totalCount: $0.value,
                              inFilePaths: ($0.value != 0) ? [filePath] : [])
+        }
+    }
+}
+
+// printFmt
+extension FindU {
+    public static func printOut(result: [UsageInfo], with formatter: String) {
+        _ = result.map {
+            var item = formatter.replacingOccurrences(of: "<C>", with: $0.className)
+                .replacingOccurrences(of: "<T>", with: String($0.totalCount))
+            var filePathes = $0.atFilePathes.reduce("[\n") {
+                $0 + $1 + "\n"
+            }
+            filePathes = filePathes + "]"
+            item = item.replacingOccurrences(of: "<P>", with: filePathes)
+            print(item)
         }
     }
 }

@@ -40,7 +40,7 @@ cli.addOption(fileExtOption)
 
 let printFmtOption = StringOption(
     longFlag: "print-format", required: false,
-    helpMessage: "Customize the print format. You can pass Class:<C> Totoal:<T> Paths:<P>. <C> will be replaced by class name, <T> will be replaced by total count, <P> will be replaced by file pathes")
+    helpMessage: "Customize the print format. You can pass Class:<C> Total:<T> Paths:<P>. <C> will be replaced by class name, <T> will be replaced by total count, <P> will be replaced by file pathes")
 cli.addOption(printFmtOption)
 
 let versionOption = BoolOption(
@@ -89,7 +89,7 @@ classesOption.value.map {
     ocClasses.insert(contentsOf: $0, at: 0)
 }
 let fileExt = fileExtOption.value ?? ["h", "m", "mm", "swift"]
-let printFmt = printFmtOption.value
+let printFmt = printFmtOption.value ?? "Class: <C> Total: <T>"
 
 let findU = FindU(projectPath: projectPath,
                   swiftClasses: swiftClasses,
@@ -97,15 +97,5 @@ let findU = FindU(projectPath: projectPath,
                   searchInFileExt: fileExt)
 
 let usageInfo = findU.getTotalUsage()
-
-guard let printFmt = printFmt else {
-    _ = usageInfo.map { info in
-        print("Class: \(info.className) Total: \(info.totalCount) AtFilePathes: [")
-        _ = info.atFilePathes.map { print($0) }
-        print("]")
-    }
-    exit(EX_OK)
-}
-
-// TODO: print format
+FindU.printOut(result: usageInfo, with: printFmt)
 

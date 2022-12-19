@@ -12,7 +12,7 @@ class ExtensionFindProcess: NSObject {
     let find: Process
     let grep: Process
     
-    init?(path: Path, extensions: [String], excluded: [String]) {
+    init?(path: Path, extensions: [String], excludeClasses: [String]) {
         do {
             find = Process()
             find.launchPath = "/usr/bin/find"
@@ -36,9 +36,9 @@ class ExtensionFindProcess: NSObject {
         do {
             grep = Process()
             grep.launchPath = "/usr/bin/grep"
-            guard !excluded.isEmpty else { return nil }
+            guard !excludeClasses.isEmpty else { return nil }
             var excludeArg = ""
-            for (idx, className) in excluded.enumerated() {
+            for (idx, className) in excludeClasses.enumerated() {
                 if idx != 0 {
                     excludeArg.append(#"\|"#)
                 }
@@ -50,8 +50,8 @@ class ExtensionFindProcess: NSObject {
         }
     }
     
-    convenience init?(path: String, extensions: [String], excluded: [String]) {
-        self.init(path: Path(path), extensions: extensions, excluded: excluded)
+    convenience init?(path: String, extensions: [String], excludeClasses: [String]) {
+        self.init(path: Path(path), extensions: extensions, excludeClasses: excludeClasses)
     }
     
     func execute() -> Set<String> {
