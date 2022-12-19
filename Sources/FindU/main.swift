@@ -10,7 +10,7 @@ import CommandLineKit
 import Rainbow
 import FindUKit
 
-let appVersion = "0.0.1"
+let appVersion = "0.1.0"
 
 let cli = CommandLineKit.CommandLine()
 let projectPathOption = StringOption(
