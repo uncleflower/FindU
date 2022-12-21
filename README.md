@@ -20,20 +20,20 @@ When counting how many times a class is used in the project, you may use global 
 Input your project path and target class name run following command, you will get the number of times the class has been used in your project.
 
 ```shell
-> FindU -p path/to/project -c TargetClassName
+> .build/release/FindU -p path/to/project -c TargetClassName
 ```
 
 You can use following command to specify whether it is a Swift class or an Objective-C class, Swift class will only searched in .swift file, Objective-C class will searched in .h, .m., .mm file
 
 ```shell
-> FindU -p path/to/project -c ClassName1 ClassName2 -s SwiftClassName1 SwiftClassName2 -o OCClassName1 OCClassName2
+> .build/release/FindU -p path/to/project -c ClassName1 ClassName2 -s SwiftClassName1 SwiftClassName2 -o OCClassName1 OCClassName2
 ```
 
 FindU support customize the print format by using --print-format argument
 
 ```shell
 
-> FindU -p path/to/project -c ClassName1 ClassName2 -s SwiftClassName1 SwiftClassName2 -o OCClassName1 OCClassName2 --print-format "Class:<C> Total:<T> Paths:<P>"
+> .build/release/FindU -p path/to/project -c ClassName1 ClassName2 -s SwiftClassName1 SwiftClassName2 -o OCClassName1 OCClassName2 --print-format "Class:<C> Total:<T> Paths:<P>"
 
 ```
 
