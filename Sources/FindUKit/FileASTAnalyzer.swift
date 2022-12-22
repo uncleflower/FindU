@@ -34,8 +34,7 @@ class SwiftASTVisitor: SyntaxVisitor, FileASTVisitor {
     }
     
     override func visit(_ node: IdentifierExprSyntax) -> SyntaxVisitorContinueKind {
-        // TODO: a littel weird, should optimize it
-        _ = classNames.filter { node.description.cleanString == $0 }.map {
+        _ = classNames.filter { node.identifier.text.cleanString == $0 }.map {
             result[$0]! += 1
         }
         return .visitChildren
