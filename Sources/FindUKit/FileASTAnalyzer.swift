@@ -43,8 +43,12 @@ class SwiftASTVisitor: SyntaxVisitor, FileASTVisitor {
     func analyze() throws -> [ClassName : Count] {
         guard !classNames.isEmpty else { return [:] }
         let treeURL = URL(fileURLWithPath: filePath)
-        let tree = try SyntaxParser.parse(treeURL)
-        self.walk(tree)
+        do {
+            let tree = try SyntaxParser.parse(treeURL)
+            self.walk(tree)
+        } catch {
+            print("Fail to analyze file: \(filePath)".red)
+        }
         return result
     }
 }
